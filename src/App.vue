@@ -1,15 +1,43 @@
 <template>
   <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <Oscillator v-for="voice in voices" :key="voice.id"
+    :frequency="voice.frequency" :waveform="voice.waveform"
+    :ref="addOscillator"/>
+  <br>
+  <button @click="startAllOscillators">Start all</button>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Oscillator from './components/Oscillator.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Oscillator
+  },
+  data() {
+    return {
+      voices: [
+        {frequency: 70, waveform: "sawtooth"},
+        {frequency: 69, waveform: "sawtooth"},
+        {frequency: 71, waveform: "sawtooth"},
+        {frequency: 35, waveform: "sine"},
+      ],
+      oscillators: []
+    }
+  },
+  beforeUpdate() {
+    this.oscillators = [];
+  },
+  methods: {
+    addOscillator(osc) {
+      this.oscillators.push(osc);
+    },
+    startAllOscillators() {
+      this.oscillators.forEach(osc => {
+        osc.startTone();
+      });
+    }
   }
 }
 </script>
