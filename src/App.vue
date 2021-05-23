@@ -12,17 +12,20 @@
       @mouseup="stopAllOscillators()">
       {{note.toNote()}}
     </button>
+    <Sequencer @stop-note="stopAllOscillators()" @play-note="startAllOscillators($event.frequency)"/>
   </div>
 </template>
 
 <script>
 import Oscillator from './components/Oscillator.vue'
+import Sequencer from './components/Sequencer.vue'
 import * as Tone from 'tone'
 
 export default {
   name: 'App',
   components: {
-    Oscillator
+    Oscillator,
+    Sequencer
   },
   data() {
     let harmonizations = Array.from({length:25},(v,k)=>k);
