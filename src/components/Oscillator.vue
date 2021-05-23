@@ -5,44 +5,38 @@
 </template>
 
 <script>
+import * as Tone from 'tone'
+
 export default {
     name: 'Oscillator',
-    inject: ['audioContext'],
-    props: {
-        waveform: {
-            type: String,
-            required: true
-        },
-        frequency: {
-            type: Number,
-            required: true
-        }
-    },
     data() {
         return {
-            oscillator: null,
+            waveform: "sine",
+            frequency: 440
         }
     },
-    created() {
-        console.log(`Creating oscillator node from context: ${this.audioContext}`);
+    mounted() {
+        console.log(`Creating Tone.js synth`);
+        this.synth = new Tone.MonoSynth({
+            oscillator: {
+                type: this.waveform
+            },
+            envelope: {
+                attack: 0.1
+            }
+        }).toDestination();
+        this.synth.volume.value = -6;
     },
     methods: {
         startTone() {
-            if(!this.oscillator) {
-                this.audioContext.resume().then(() => {
-                    this.oscillator = this.audioContext.createOscillator();
-                    this.oscillator.connect(this.audioContext.destination);
-                    this.oscillator.type = this.waveform;
-                    this.oscillator.frequency.setValueAtTime(this.frequency, this.audioContext.currentTime);
-                    this.oscillator.start();
-                })
+            if(this.synth) {
+                //this.synth.triggerAttackRelease("C4", "8n");
+                this.synth.triggerAttack(this.frequency);
             }
         },
         stopTone() {
-            if(this.oscillator) {
-                this.oscillator.stop();
-                this.oscillator.disconnect();
-                this.oscillator = null;
+            if(this.synth) {
+                this.synth.triggerRelease();
             }
         }
     }

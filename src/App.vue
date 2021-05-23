@@ -1,14 +1,19 @@
 <template>
   <img alt="Vue logo" src="./assets/logo.png">
-  <Oscillator v-for="voice in voices" :key="voice.id"
-    :frequency="voice.frequency" :waveform="voice.waveform"
-    :ref="addOscillator"/>
-  <br>
-  <button @click="startAllOscillators">Start all</button>
+  <div v-if="toneReady == false">
+    <button @click="startTone">Start!</button>
+  </div>
+  <div v-else>
+    <Oscillator v-for="voice in voices" :key="voice.id"
+        :ref="addOscillator"/>
+    <br>
+    <button @click="startAllOscillators">Start all</button>
+  </div>
 </template>
 
 <script>
 import Oscillator from './components/Oscillator.vue'
+import * as Tone from 'tone'
 
 export default {
   name: 'App',
@@ -17,11 +22,9 @@ export default {
   },
   data() {
     return {
+      toneReady: false,
       voices: [
-        {frequency: 70, waveform: "sawtooth"},
-        {frequency: 69, waveform: "sawtooth"},
-        {frequency: 71, waveform: "sawtooth"},
-        {frequency: 35, waveform: "sine"},
+        {frequency: 70, waveform: "sawtooth"}
       ],
       oscillators: []
     }
@@ -30,6 +33,12 @@ export default {
     this.oscillators = [];
   },
   methods: {
+    startTone() {
+      Tone.start().then(() => {
+        console.log("Tone.js ready");
+        this.toneReady = true;
+      })
+    },
     addOscillator(osc) {
       this.oscillators.push(osc);
     },
