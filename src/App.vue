@@ -4,10 +4,14 @@
     <button @click="startTone">Start!</button>
   </div>
   <div v-else>
-    <Oscillator v-for="voice in voices" :key="voice.id"
+    <Oscillator v-for="voice in voices" :key="voice.id" :initialWaveform="voice.waveform"
         :ref="addOscillator"/>
     <br>
-    <button @click="startAllOscillators">Start all</button>
+    <button v-for="note in notes" :key="note.id"
+      @mousedown="startAllOscillators(note.toFrequency())"
+      @mouseup="stopAllOscillators()">
+      {{note.toNote()}}
+    </button>
   </div>
 </template>
 
@@ -21,12 +25,16 @@ export default {
     Oscillator
   },
   data() {
+    let harmonizations = Array.from({length:25},(v,k)=>k);
+
     return {
       toneReady: false,
       voices: [
-        {frequency: 70, waveform: "sawtooth"}
+        {waveform: "sawtooth"},
+        {waveform: "sine"},
       ],
-      oscillators: []
+      oscillators: [],
+      notes: Tone.Frequency("C2").harmonize(harmonizations)
     }
   },
   beforeUpdate() {
@@ -42,9 +50,14 @@ export default {
     addOscillator(osc) {
       this.oscillators.push(osc);
     },
-    startAllOscillators() {
+    startAllOscillators(note) {
       this.oscillators.forEach(osc => {
-        osc.startTone();
+        osc.attack(note);
+      });
+    },
+    stopAllOscillators() {
+      this.oscillators.forEach(osc => {
+        osc.release();
       });
     }
   }
